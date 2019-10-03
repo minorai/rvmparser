@@ -373,14 +373,20 @@ bool parseRVM(class Store* store, const void * ptr, size_t size)
       p = parse_prim(&ctx, p, e);
       if (p == nullptr) return false;
       break;
+    case id("COLR"):
+      fprintf(stderr, "Warning: Skipping COLR chunk of %u (=0x%x) bytes.\n", len,len);
+      p = l + len;
+      break;
     default:
       snprintf(ctx.buf, ctx.buf_size, "Unrecognized chunk %s", chunk_id);
       store->setErrorString(buf);
       return false;
     }
     l = p;
-    p = parse_chunk_header(chunk_id, len, dunno, p, e);
-    id_chunk_id = id(chunk_id);
+    if (p < e) {
+      p = parse_chunk_header(chunk_id, len, dunno, p, e);
+      id_chunk_id = id(chunk_id);
+    }
   }
 
   assert(ctx.group_stack.size() == 2);
