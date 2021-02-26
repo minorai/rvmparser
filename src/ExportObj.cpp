@@ -272,6 +272,18 @@ void ExportObj::geometry(struct Geometry* geometry)
         auto p = scale * mul(geometry->M_3x4, Vec3f(tri->vertices + i));
         auto n = normalize(mul(Mat3f(geometry->M_3x4.data), Vec3f(tri->normals + i)));
 
+        if (isnan(n.x) || isnan(n.y) || isnan(n.z))
+        {
+            auto arg1 = Mat3f(geometry->M_3x4.data);
+            auto arg2 = Vec3f(tri->normals + i);
+            auto arg3 = mul(arg1, arg2);
+            auto arg4 = normalize(arg3);
+            printf("");
+            n.x = 1.0f;
+            n.y = 0.0f;
+            n.z = 0.0f;
+        }
+
         fprintf(out, "v %f %f %f\n", p.x, p.y, p.z);
         fprintf(out, "vn %f %f %f\n", n.x, n.y, n.z);
       }
@@ -282,19 +294,19 @@ void ExportObj::geometry(struct Geometry* geometry)
         }
       }
       else {
-        for (size_t i = 0; i < tri->vertices_n; i++) {
+        /*for (size_t i = 0; i < tri->vertices_n; i++) {
           auto p = scale * mul(geometry->M_3x4, Vec3f(tri->vertices + 3*i));
           fprintf(out, "vt %f %f\n", 0*p.x, 0*p.y);
-        }
+        }*/
 
         for (size_t i = 0; i < 3 * tri->triangles_n; i += 3) {
           auto a = tri->indices[i + 0];
           auto b = tri->indices[i + 1];
           auto c = tri->indices[i + 2];
-          fprintf(out, "f %d/%d/%d %d/%d/%d %d/%d/%d\n",
-                  a + off_v, a + off_t, a + off_n,
-                  b + off_v, b + off_t, b + off_n,
-                  c + off_v, c + off_t, c + off_n);
+          fprintf(out, "f %d//%d %d//%d %d//%d\n",
+                  a + off_v, a + off_n,
+                  b + off_v, b + off_n,
+                  c + off_v, c + off_n);
         }
       }
 

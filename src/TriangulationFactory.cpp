@@ -330,11 +330,13 @@ Triangulation* TriangulationFactory::pyramid(Arena* arena, const Geometry* geo, 
     },
   };
 
+  float hn = abs(h2) < 0.00001f ? 1 : h2;
+
   Vec3f n[6] = {
-    Vec3f( 0.f, -h2,  (quad[1][0][1] - quad[0][0][1]) ),
-    Vec3f(  h2, 0.f, -(quad[1][1][0] - quad[0][1][0]) ),
-    Vec3f( 0.f,  h2, -(quad[1][2][1] - quad[0][2][1]) ),
-    Vec3f( -h2, 0.f,  (quad[1][3][0] - quad[0][3][0]) ),
+    Vec3f( 0.f, -hn,  (quad[1][0][1] - quad[0][0][1]) ),
+    Vec3f(hn, 0.f, -(quad[1][1][0] - quad[0][1][0]) ),
+    Vec3f( 0.f,  hn, -(quad[1][2][1] - quad[0][2][1]) ),
+    Vec3f( -hn, 0.f,  (quad[1][3][0] - quad[0][3][0]) ),
     Vec3f(0, 0, -1 ),
     Vec3f(0, 0, 1),
   };
@@ -841,7 +843,7 @@ Triangulation* TriangulationFactory::snout(Arena* arena, const Geometry* geo, fl
       float s = (sn.offset[0] * t0[2 * i + 0] + sn.offset[1] * t0[2 * i + 1]);
       float nx = t0[2 * i + 0];
       float ny = t0[2 * i + 1];
-      float nz = -(sn.radius_t - sn.radius_b + s) / sn.height;
+      float nz = abs(sn.height) < 0.00001f ? 0 : -(sn.radius_t - sn.radius_b + s) / sn.height;
 
       l = vertex(tri->normals, tri->vertices, l, nx, ny, nz, xb, yb, zb);
       l = vertex(tri->normals, tri->vertices, l, nx, ny, nz, xt, yt, zt);
